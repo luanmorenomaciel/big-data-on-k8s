@@ -1,0 +1,19 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: crj-mysql-ingestion
+spec:
+  schedule: "*/10 * * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: crj-mysql-ingestion
+            image: owshq/ingestion-data-stores:0.1
+            imagePullPolicy: IfNotPresent
+            command: ["python3.9","cli.py","mysql"]
+          restartPolicy: OnFailure
+
+

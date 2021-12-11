@@ -1,0 +1,30 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaUser
+metadata:
+  name: luan.moreno
+  labels:
+    strimzi.io/cluster: edh
+spec:
+  authentication:
+    type: scram-sha-512
+  authorization:
+    type: simple
+    acls:
+      - resource:
+          type: topic
+          name: src-app-users-json
+          patternType: literal
+        operation: Write
+        host: "*"
+      - resource:
+          type: topic
+          name: src-app-users-json
+          patternType: literal
+        operation: Create
+        host: "*"
+      - resource:
+          type: topic
+          name: src-app-users-json
+          patternType: literal
+        operation: Describe
+        host: "*"

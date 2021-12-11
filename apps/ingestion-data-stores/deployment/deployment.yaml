@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ingestion-data-stores-python-app
+  labels:
+    name: ingestion-data-stores-python-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: ingestion-data-stores-python-app
+  template:
+    metadata:
+      name: ingestion-data-stores-python-app
+      labels:
+        name: ingestion-data-stores-python-app
+    spec:
+      containers:
+        - name: ingestion-data-stores-python-app
+          image: owshq/ingestion-data-stores-python-app:0.1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          env:
+            - name: DEBUG_MODE
+              value: "1"
