@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-lb-pinot-controller-ui
+  namespace: datastore
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 9001
+    targetPort: 9000
+  selector:
+    app: pinot
+    component: controller

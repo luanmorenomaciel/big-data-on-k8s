@@ -1,0 +1,35 @@
+apiVersion: "kafka.strimzi.io/v1beta2"
+kind: "KafkaConnector"
+metadata:
+  # connector name
+  name: "ingest-src-sqlserver-subscription-avro-0bf02906"
+  labels:
+    # kafka connect [cluster] name
+    strimzi.io/cluster: edh
+spec:
+  class: io.confluent.connect.jdbc.JdbcSourceConnector
+  tasksMax: 2
+  config:
+    key.converter: "io.confluent.connect.avro.AvroConverter"
+    key.converter.schema.registry.url: "http://schema-registry-cp-schema-registry:8081"
+    value.converter: "io.confluent.connect.avro.AvroConverter"
+    value.converter.schema.registry.url: "http://schema-registry-cp-schema-registry:8081"
+    connection.url: "jdbc:sqlserver://mssql-mssql-linux.database.svc.cluster.local:1433;databaseName=OwsHQ"
+    connection.user: "sa"
+    connection.password: "IlS27OpKxw9EYObU80dz"
+    connection.attempts: "2"
+    query: "SELECT * FROM dbo.subscription"
+    mode: "incrementing"
+    topic.prefix: "src-sqlserver-subscription-avro"
+    incrementing.column.name: "incr"
+    validate.non.null: "false"
+    transforms: "createKey,extractInt,InsertTopic,InsertSourceDetails"
+    transforms.createKey.type: "org.apache.kafka.connect.transforms.ValueToKey"
+    transforms.createKey.fields: "incr"
+    transforms.extractInt.type: "org.apache.kafka.connect.transforms.ExtractField$Key"
+    transforms.extractInt.field: "incr"
+    transforms.InsertTopic.type: "org.apache.kafka.connect.transforms.InsertField$Value"
+    transforms.InsertTopic.topic.field: "messagetopic"
+    transforms.InsertSourceDetails.type: "org.apache.kafka.connect.transforms.InsertField$Value"
+    transforms.InsertSourceDetails.static.field: "messagesource"
+    transforms.InsertSourceDetails.static.value: "sqlserver"

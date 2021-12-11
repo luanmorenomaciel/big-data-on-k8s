@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ksqldb-server
+  labels:
+    app: ksqldb-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ksqldb-server
+  template:
+    metadata:
+      labels:
+        app: ksqldb-server
+    spec:
+      containers:
+      - name: ksqldb-server
+        image: confluentinc/ksqldb-server:0.22.0
+        ports:
+        - containerPort: 8088
+        env:
+        - name: KSQL_BOOTSTRAP_SERVERS
+          value: PLAINTEXT://edh-kafka-brokers.ingestion.svc.Cluster.local:9092
+        - name: KSQL_KSQL_SCHEMA_REGISTRY_URL
+          value: 'http://schema-registry-cp-schema-registry.ingestion.svc.Cluster.local:8081'
+        - name: KSQL_LISTENERS
+          value: http://0.0.0.0:8088
+        - name: KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE
+          value: "true"
+        - name: KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE
+          value: "true"
+        - name: KSQL_KSQL_INTERNAL_TOPIC_REPLICAS
+          value: "1"
+        - name: KSQL_KSQL_STREAMS_REPLICATION_FACTOR
+          value: "1"
+        - name: KSQL_KSQL_LOGGING_PROCESSING_TOPIC_REPLICATION_FACTOR
+          value: "1"
+        - name: KSQL_KSQL_CONNECT_URL
+          value: 'http://edh-connect-api.ingestion.svc.Cluster.local:8083'
+        - name: KSQL_CONNECT_KEY_CONVERTER
+          value: 'io.confluent.connect.avro.AvroConverter'
+        - name: KSQL_CONNECT_VALUE_CONVERTER
+          value: 'io.confluent.connect.avro.AvroConverter'
+        - name: KSQL_CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL
+          value: 'http://schema-registry-cp-schema-registry:8081'
+        - name: KSQL_CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL
+          value: 'http://schema-registry-cp-schema-registry:8081'
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1500Mi
+          limits:
+            cpu: 1000m
+            memory: 3000Mi

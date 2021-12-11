@@ -1,0 +1,276 @@
+image:
+  repository: trinodb/trino
+  tag: 364
+  pullPolicy: IfNotPresent
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+
+ingress:
+  enabled: false
+  annotations: {}
+  host: ""
+  tls:
+    secretName: ""
+
+server:
+  workers: 3
+  node:
+    environment: production
+    dataDir: /data/trino
+    pluginDir: /usr/lib/trino/plugin
+  log:
+    trino:
+      level: INFO
+  config:
+    path: /etc/trino
+    http:
+      port: 8080
+    processForwarded: false
+    # Trino supports multiple authentication types: PASSWORD, CERTIFICATE, OAUTH2, JWT, KERBEROS
+    # For more info: https://trino.io/docs/current/security/authentication-types.html
+    # authenticationType: "PASSWORD"
+    query:
+      maxMemory: "2GB"
+      maxMemoryPerNode: "2GB"
+      maxTotalMemory: "3GB"
+      maxTotalMemoryPerNode: "2GB"
+  jvm:
+    maxHeapSize: "3G"
+    gcMethod:
+      type: "UseG1GC"
+      g1:
+        heapRegionSize: "32M"
+
+initContainers: {}
+  # coordinator:
+  #   - name: init-coordinator
+  #     image: busybox:1.28
+  #     imagePullPolicy: IfNotPresent
+  #     command: ['sh', '-c', "until nslookup myservice.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for myservice; sleep 2; done"]
+  # worker:
+  #   - name: init-worker
+  #     image: busybox:1.28
+  #     command: ['sh', '-c', 'echo The worker is running! && sleep 3600']
+
+auth: {}
+  # Set username and password
+  # https://trino.io/docs/current/security/password-file.html#file-format
+  # passwordAuth: "username:encrypted-password-with-htpasswd"
+
+accessControl: {}
+  # # Supported types: pvc or configmap
+  # type: pvc
+  # refreshPeriod: 1s
+  # # Rules file is mounted to /etc/trino/access-control
+  # configFile: "/access-control/rules.json"
+  # # If you use pvc as the type, you have to specify the pvcName field:
+  # pvcName:
+  # # If you use pvc as the type, you can specify the name of the volume with the pvcVolumeName:
+  # pvcVolumeName:
+  # # If you use configmap as the type, you have to specify the rules field:
+  # rules:
+  #   rules.json: |-
+  #     {
+  #       "catalogs": [
+  #         {
+  #           "user": "admin",
+  #           "catalog": "(mysql|system)",
+  #           "allow": "all"
+  #         },
+  #         {
+  #           "group": "finance|human_resources",
+  #           "catalog": "postgres",
+  #           "allow": true
+  #         },
+  #         {
+  #           "catalog": "hive",
+  #           "allow": "all"
+  #         },
+  #         {
+  #           "user": "alice",
+  #           "catalog": "postgresql",
+  #           "allow": "read-only"
+  #         },
+  #         {
+  #           "catalog": "system",
+  #           "allow": "none"
+  #         }
+  #       ],
+  #       "schemas": [
+  #         {
+  #           "user": "admin",
+  #           "schema": ".*",
+  #           "owner": true
+  #         },
+  #         {
+  #           "user": "guest",
+  #           "owner": false
+  #         },
+  #         {
+  #           "catalog": "default",
+  #           "schema": "default",
+  #           "owner": true
+  #         }
+  #       ]
+  #     }
+
+# If you want to provide your own secrets resource, you can use this field:
+# connectorsSecret:
+
+connectors:
+    pinot.properties: |-
+     connector.name=pinot
+     pinot.controller-urls=pinot-controller.datastore.svc.Cluster.local:9000
+
+    kafka.properties: |-
+     connector.name=kafka
+     kafka.table-names=src-app-users-json,src-app-agent-json,src-app-credit-card-json,src-app-musics-json,src-app-rides-json
+     kafka.nodes=edh-kafka-brokers.ingestion.svc.Cluster.local:9092
+     kafka.hide-internal-columns=false
+
+    minio.properties: |-
+     connector.name=hive-hadoop2
+     hive.metastore=file
+     hive.s3-file-system-type=TRINO
+     hive.metastore.catalog.dir=s3://trino/
+     hive.allow-drop-table=true
+     hive.s3.aws-access-key=H4aQRS39OITgclWk
+     hive.s3.aws-secret-key=wRozzyetjvRrVQS9qpIzFVnimQFm9CqW
+     hive.s3.endpoint=http://minio.deepstorage.svc.Cluster.local
+     hive.s3.path-style-access=true
+     hive.s3.ssl.enabled=false
+     hive.s3select-pushdown.enabled=true
+     hive.allow-add-column=true
+     hive.allow-drop-column=true
+     hive.allow-drop-table=true
+     hive.allow-rename-table=true
+     hive.allow-rename-column=true
+     hive.s3.multipart.min-file-size=5GB
+     hive.s3.multipart.min-part-size=5GB
+     hive.s3.max-connections=5000
+
+    postgres.properties: |-
+     connector.name=postgresql
+     connection-url=jdbc:postgresql://yb-tservers.database.svc.Cluster.local:5433/owshq
+     connection-user=yugabyte
+     connection-password=yugabyte
+
+    sqlserver.properties: |-
+      connector.name=sqlserver
+      connection-url=jdbc:sqlserver://mssql-mssql-linux.database.svc.Cluster.local:1433;database=owshq
+      connection-user=sa
+      connection-password=IlS27OpKxw9EYObU80dz
+
+    cassandra.properties: |-
+      connector.name=cassandra
+      cassandra.contact-points=10.0.129.163:9042
+      cassandra.username=yugabyte
+      cassandra.password=yugabyte
+
+schemas:
+  # Custom schemas that will be mounted in /etc/trino/schemas
+   users_schema.json: |-
+     {
+       "tableName": "src-app-users-json",
+       "schemaName": "kafka.default",
+       "topicName": "src-app-users-json",
+       "key": {
+           "dataFormat": "json",
+           "fields": [
+               {
+                   "name": "_key",
+                   "dataFormat": "VARCHAR",
+                   "type": "VARCHAR",
+                   "hidden": "false"
+               }
+           ]
+       },
+       "message": {
+           "dataFormat": "json",
+           "fields": [
+               {
+                   "name": "user_id",
+                   "mapping": "user_id",
+                   "type": "BIGINT"
+               },
+               {
+                   "name": "uuid",
+                   "mapping": "uuid",
+                   "type": "VARCHAR"
+               },
+               {
+                   "name": "first_name",
+                   "mapping": "first_name",
+                   "type": "VARCHAR"
+               },
+               {
+                   "name": "last_name",
+                   "mapping": "last_name",
+                   "type": "VARCHAR"
+               },
+               {
+                   "name": "date_birth",
+                   "mapping": "date_birth",
+                   "type": "VARCHAR"
+               },
+               {
+                   "name": "city",
+                   "mapping": "city",
+                   "type": "VARCHAR"
+               },
+               {
+                   "name": "country",
+                   "mapping": "country",
+                   "type": "VARCHAR"
+               },
+               {
+                   "name": "company_name",
+                   "mapping": "company_name",
+                   "type": "VARCHAR"
+               },
+               {
+                   "name": "job",
+                   "mapping": "job",
+                   "type": "VARCHAR"
+               },
+               {
+                   "name": "phone_number",
+                   "mapping": "phone_number",
+                   "type": "VARCHAR"
+               },
+               {
+                   "name": "last_access_time",
+                   "mapping": "last_access_time",
+                   "type": "VARCHAR"
+               },
+               {
+                   "name": "time_zone",
+                   "mapping": "time_zone",
+                   "type": "VARCHAR"
+               },
+               {
+                   "name": "dt_current_timestamp",
+                   "mapping": "dt_current_timestamp",
+                   "type": "VARCHAR"
+               }
+           ]
+       }
+     }
+
+service:
+  type: ClusterIP
+
+resources:
+   limits:
+    cpu: 1000m
+    memory: 3000Mi
+   requests:
+    cpu: 500m
+    memory: 2000Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-lb-ksqldb
+  namespace: processing
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 8088
+    targetPort: 8088
+  selector:
+    app: ksqldb-server

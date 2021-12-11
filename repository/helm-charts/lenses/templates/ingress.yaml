@@ -1,0 +1,40 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: {{ include "ingress.apiVersion" . }}
+kind: Ingress
+metadata:
+  name:  {{ include "fullname" . }}
+  labels:
+    app: {{ include "fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    component: "lenses"
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+    lenses.io/app: {{ include "fullname" . }}
+    lenses.io/app.type: lenses-ingress
+    {{- range $key, $value := .Values.labels }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  annotations:
+  {{- range $key, $value := .Values.ingress.annotations }}
+    {{ $key }}: {{ $value | quote }}
+  {{- end }}
+spec:
+  rules:
+  - host: {{ .Values.ingress.host | quote }}
+    http:
+      paths:
+      - path: {{if .Values.ingress.path }}{{ .Values.ingress.path }}{{else}}"/"{{end}}
+        backend:
+          serviceName: {{ include "fullname" . | quote }}
+          servicePort: {{ .Values.servicePort }}
+  {{- if .Values.ingress.tls.enabled }}
+  tls:
+    - hosts:
+      - {{ .Values.ingress.host | quote }}
+      {{- if .Values.ingress.tls.secretName }}
+      secretName: {{ .Values.ingress.tls.secretName }}
+      {{- else }}
+      secretName: {{ include "fullname" . | quote }}
+      {{- end }}
+  {{- end -}}
+{{- end -}}

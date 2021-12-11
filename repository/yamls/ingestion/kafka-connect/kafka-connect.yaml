@@ -1,0 +1,65 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnect
+metadata:
+  # kafka connect cluster name
+  name: edh
+  annotations:
+     strimzi.io/use-connector-resources: "true"
+  labels:
+    app: edh
+spec:
+  version: 3.0.0
+  replicas: 1
+  bootstrapServers: edh-kafka-bootstrap:9093
+  image: mateushenrique/owshq-kafka-connect-strimzi:3.0.0
+  # imagePullPolicy: Always
+  tls:
+    trustedCertificates:
+      - secretName: edh-cluster-ca-cert
+        certificate: ca.crt
+  config:
+    # default config [strimzi]
+    key.converter: org.apache.kafka.connect.json.JsonConverter
+    value.converter: org.apache.kafka.connect.json.JsonConverter
+    key.converter.schemas.enable: true
+    value.converter.schemas.enable: true
+    internal.key.converter: org.apache.kafka.connect.json.JsonConverter
+    internal.value.converter: org.apache.kafka.connect.json.JsonConverter
+    internal.key.converter.schemas.enable: false
+    internal.value.converter.schemas.enable: false
+
+    # schema registry [sc] config
+    # key.converter: io.confluent.connect.avro.AvroConverter
+    # key.converter.schema.registry.url: "http://schema-registry-cp-schema-registry:8081"
+    # value.converter: io.confluent.connect.avro.AvroConverter
+    # value.converter.schema.registry.url: "http://schema-registry-cp-schema-registry:8081"
+
+    # config connect cluster
+    group.id: connect-cluster
+    offset.storage.topic: connect-cluster-offsets
+    config.storage.topic: connect-cluster-configs
+    status.storage.topic: connect-cluster-status
+    config.storage.replication.factor: -1
+    offset.storage.replication.factor: -1
+    status.storage.replication.factor: -1
+
+    # file config provider
+    #config.providers: file
+    #config.providers.file.class: org.apache.kafka.common.config.provider.FileConfigProvider
+  resources:
+    requests:
+        memory: 2Gi
+        cpu: 500m
+    limits:
+        memory: 3Gi
+        cpu: 1000m
+  metricsConfig:
+    type: jmxPrometheusExporter
+    valueFrom:
+      configMapKeyRef:
+        name: connect-metrics
+        key: metrics-config.yml
+  logging:
+    type: inline
+    loggers:
+      log4j.rootLogger: "INFO"

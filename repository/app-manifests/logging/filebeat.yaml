@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  # app name
+  name: filebeat
+  # deployed yaml
+  namespace: cicd
+spec:
+  project: default
+  source:
+    repoURL: 'https://bitbucket.org/owshq/big-data-on-k8s.git'
+    path: repository/helm-charts/filebeat
+    targetRevision: HEAD
+    helm:
+      valueFiles:
+        - values-development.yaml
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: logging
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

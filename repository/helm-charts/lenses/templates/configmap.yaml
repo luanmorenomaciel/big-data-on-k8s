@@ -1,0 +1,19 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: "{{ include "fullname" . }}"
+  labels:
+    app: "{{ include "fullname" . }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+    lenses.io/app: "{{ include "fullname" . }}"
+    lenses.io/app.type: lenses-configmap
+data:
+  {{- if and .Values.lenses.kafka.sasl.enabled .Values.lenses.kafka.sasl.krb5Conf }}
+  "krb5.conf": |-
+    {{- .Values.lenses.kafka.sasl.krb5Conf | nindent 4 }}
+  {{- end }}
+
+  "lenses.append.conf": |-
+    {{- include "lensesAppendConf" . | nindent 4 }}

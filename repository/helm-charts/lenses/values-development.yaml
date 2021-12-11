@@ -1,0 +1,516 @@
+### TO DEPLOY SQL RUNNERS IN THE CLUSTER
+### FROM LENSES YOU NEED TO PATCH THE SERVICE ACCOUNT
+### LENSES WILL USE TO DEPLOY. SEE:
+### https://docs.lenses.io/install_setup/deployment-options/kubernetes-deployment.html
+
+image:
+  repository: lensesio/lenses
+  pullPolicy: IfNotPresent
+
+annotations: {}
+labels: {}
+strategy: {}
+nodeSelector: {}
+tolerations: {}
+affinity: {}
+securityContext: {}
+
+# Monitoring
+monitoring:
+  pipeline: lenses
+  enabled: true
+  port: 9102
+  path: "/metrics"
+
+# Resource management
+resources:
+  limits:
+    memory: 2Gi
+  requests:
+    memory: 2Gi
+
+# rbacEnable indicates if a the cluster has rbac enabled and a cluster role
+# and rolebinding should be created for the service account
+rbacEnable: true
+
+# restPort is the Lenses rest port
+restPort: 3030
+servicePort: 83
+
+# serviceAccount is the Service account to be used by Lenses to deploy apps
+serviceAccount: default
+
+# If you use Data Policies module enable a Persistent Volume to keep your data policies rule.
+persistence:
+  enabled: true
+  accessModes:
+    - ReadWriteOnce
+  size: 5Gi
+  # Target an pre-existing volume claim to use it as Lenses Persistent volume
+  # existingClaim:
+
+  ## Policies data Persistent Volume Storage Class
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  # storageClass: "-"
+
+#service
+service:
+  enabled: true
+  type: ClusterIP
+  annotations: {}
+
+  externalTrafficPolicy:
+
+  # If you want to make it available as a node port, then add nodePort: <somePort>
+  # Warning: this should not be used with servicePort:
+  # nodePort:
+
+  ## Load balancer IP address
+  ## Is not required, but allows for static address with
+  ## serviceType LoadBalancer.
+  ## If not supported by cloud provider, this field is ignored.
+  ## Default: nil
+  ##
+  # loadBalancerIP:
+
+  ## This will restrict traffic through the cloud-provider load-balancer
+  ## to the specified client IPs.
+  ## If not supported by cloud provider, this field is ignored.
+  ## Default: nil
+  ##
+  # loadBalancerSourceRanges:
+  #   - 0.0.0.0/0
+
+ingress:
+  ## If true, Ingress will be created
+  ##
+  enabled: false
+  host:
+
+  # Ingress annotations
+  annotations:
+    kubernetes.io/ingress.class: traefik
+#    kubernetes.io/ingress.class: nginx
+#    kubernetes.io/tls-acme: 'true'
+#    nginx.ingress.kubernetes.io/rewrite-target: /
+
+  # TLS if enabled load the tls.crt and tls.keys as a secrets and enable TLS on the ingress
+  tls:
+    enabled: false
+    crt: |-
+
+    key: |-
+
+lenses:
+  # For generic settings
+  # Read more: https://docs.lenses.io/4.0/configuration/jvm/#content
+  lensesOpts: |-
+
+  append:
+    # Add custom configuration values, will take precedence over the env variables and auto-generated values
+    # Read more: https://docs.lenses.io/3.2/install_setup/deployment-options/docker-deployment.html#configuration-via-files-and-secrets
+    conf: |-
+
+  jvm:
+    # heapOpts are any overrides for Lenses Heap JVM options
+    heapOpts: |-
+
+    # logBackOpts are any logging options
+    logBackOpts:
+
+    #performanceOpts are any jvm tuning options to add to the jvm
+    performanceOpts:
+
+    # base64 encoded truststore data
+    trustStoreFileData: |-
+
+    # trust store password
+    trustStorePassword:
+
+  # TODO: Replace with docker implementation
+  # Global truststore/keystore for the JVM
+  opts:
+    # base64 encoded truststore data
+    # openssl base64 < kafka.truststore.jks | tr -d '\n'
+    trustStoreFileData: |-
+
+    # base64 trust store password
+    # echo "$password" | tr -d '\n' | base64
+    trustStorePassword: |-
+
+    # base64 encoded truststore data
+    # openssl base64 < kafka.truststore.jks | tr -d '\n'
+    keyStoreFileData: |-
+
+    # base64 keystore password
+    # echo "$password" | tr -d '\n' | base64
+    keyStorePassword: |-
+
+  tls:
+    # TLS setup for serving Lenses over TLS
+    enabled: false
+
+    # base64 encoded truststore data
+    # openssl base64 < kafka.truststore.jks | tr -d '\n'
+    keyStoreFileData: |-
+
+    # base64 keystore password
+    # echo "$password" | tr -d '\n' | base64
+    keyStorePassword: |-
+
+    # base64 key password
+    # echo "$password" | tr -d '\n' | base64
+    keyPassword: |-
+
+    # Authenticate to Lenses with client authentication
+    clientAuth: false
+
+    # base64 encoded truststore data
+    # openssl base64 < kafka.truststore.jks | tr -d '\n'
+    trustStoreFileData: |-
+
+    # base64 trust store password
+    # echo "$password" | tr -d '\n' | base64
+    trustStorePassword: |-
+
+  # Broker details
+  ## Brokers should be behind a service, if so set one entry in the hosts
+  ## If your brokers are outside explicitly add them to the hosts. Note you only need one to bootstrap
+  ## but you should specify more than one for resilience
+
+  # kafka ssl
+  # The keytab, key and truststores file data are the base64 encoded contents of the files. YOU MUST PROVIDE THE DATA BASE64 encoded
+  # openssl base64 < client.keystore.jks | tr -d '\n'
+  # The passwords will be base64enc by the secret
+  # and added to the kafka secret and mounted into /mnt/secrets
+  kafka:
+    ssl:
+      # TLS setup to connect to brokers over TLS with/without client authentication
+      enabled: false
+
+      # base64 encoded truststore data
+      trustStoreFileData: |-
+
+      # password strings
+      trustStorePassword:
+
+      # base64 encoded keystore data
+      keyStoreFileData: |-
+
+      keyStorePassword:
+      keyPassword:
+    sasl:
+      # Authenticate to brokers using SASL, can be used in conjuction with SSL
+      enabled: false
+
+      # mechanism is the sasl authentication mechanism GSSAPI, SCRAM or PLAIN
+      mechanism: GSSAPI
+
+      # jaasFileData is the contents of the kafka jaas file mounted in /mnt/secrets
+      # Note: this will be deprecated in favor of jaasConfig
+      jaasFileData: |-
+
+      # jaasConfig
+      # This configuration is used inline, so do not enclose it in 'KafkaClient{ }'
+      # jaasConfig: |-
+      #   com.sun.security.auth.module.Krb5LoginModule required useKeyTab=true keyTab="lenses.keytab" storeKey=true useTicketCache=false serviceName=kafka principal="lenses@TESTING.LENSES.IO";
+      jaasConfig: |-
+
+      # krb5Conf is the kerberos config data to be mounted into /etc
+      krb5Conf: |-
+
+      # keyTabData is the base64 contents kerberos keytab file is using kerberos mounted in /mnt/secrets
+      # openssl base64 < keytab | tr -d '\n'
+      keyTabData: |-
+
+    # JMX/JOLOKIA Metrics
+    metrics:
+      enabled: false
+      username:
+      password:
+      ssl:
+      type: "JMX"
+      port: 9102
+      # For multiple ports:
+      # ports:
+      #   - id: foo
+      #     port: 9103
+      #     host: example1
+      #   - id: bar
+      #     port: 9104
+      #     host: example2
+      # For multiple ports from AWS:
+      # type: AWS
+      # ports:
+      #   - id: foo
+      #     url: example1:9103
+      #   - id: bar
+      #     url: example2:9104
+
+    bootstrapServers:
+      - name: "edh-kafka-bootstrap.ingestion.svc.cluster.local"
+        port: 9092
+        sslPort: 9093
+        saslSslPort: 9094
+        saslPlainTextPort: 9095
+
+  # zookeeper
+  ## Zookeepers should be behind a service, if so set one entry in the hosts
+  ## If your zookeepers are outside explicitly add them to the hosts.
+  zookeepers:
+    enabled: true
+    chroot:
+    hosts:
+      - host: "edh-zookeeper-client.ingestion.svc.Cluster.local"
+        port: 2181
+        # JMX/JOLOKIA Metrics
+        # metrics:
+        #   type: "JMX"
+        #   port: 9102
+        #   protocol:
+        #   username:
+        #   password:
+        #   ssl:
+
+  # schemaRegistries
+  ## Schema registries should be behind a service, if so set one entry in the hosts
+  ## If your schema registries are outside explicitly add them to the hosts.
+  schemaRegistries:
+    enabled: true
+    mode:
+    topic:
+    hosts:
+      - host: "schema-registry-cp-schema-registry.ingestion.svc.cluster.local"
+        protocol: http
+        port: 8081
+        # If your schema registry accepts request in a path eg. <url>:<port>/api/v1
+        path:
+        # JMX/JOLOKIA Metrics
+        # metrics:
+        #   type: "JMX"
+        #   port: 9102
+        #   protocol:
+        #   username:
+        #   password:
+        #   ssl:
+
+    ssl:
+      ## Encryption in Transit
+      # base64 encoded truststore data
+      trustStoreFileData: |-
+
+      # password strings
+      trustStorePassword:
+
+      ## Authentication via TLS certificates
+      # base64 encoded keystore data
+      keyStoreFileData: |-
+
+      keyStorePassword:
+      keyPassword:
+
+    security:
+      enabled: false
+
+      # Authenticate against a protected cluster
+      # For BasicAuth set authType to `USER_INFO`
+      authType:
+      username:
+      password:
+
+  connectClusters:
+    enabled: true
+    clusters:
+      - name: edh
+        port: 8083
+        jmxPort: 9102
+        protocol: http
+        offsetsTopic: connect-offsets
+        statusTopic: connect-status
+        configTopic: connect-configs
+
+        # Authenticate using BasicAuth
+        # authType:
+        # username:
+        # password:
+
+        # TODO: Add connect auth using SSL
+
+        # Secret provider
+        # aes256:
+        #  - key: PasswordPasswordPasswordPassword
+
+        hosts:
+          - host: "edh-connect-api.ingestion.svc.cluster.local"
+            # JMX/JOLOKIA Metrics
+            #  metrics:
+            #  type: "JMX"
+            #  port: 9102
+            #   protocol:
+            #   username:
+            #   password:
+            #   ssl:
+
+
+  storage:
+    postgres:
+      enabled: true
+      host: postgres-postgresql.database.svc.cluster.local
+      port: 5432              # optional, defaults to 5432
+      username: postgres
+      password: 6e8e5979-25c5-44e2-ad76-7a4e8ee68c6f
+      database: lenses
+      schema:             # optional, defaults to public schema
+
+  # Data Application Deployment Framework
+  deployments:
+    eventsBufferSize: 10000
+    errorsBufferSize: 1000
+
+    connect:
+      statusInterval: 30 second
+      actionsBufferSize: 1000
+
+  # sql
+  sql:
+#    processorImage: eu.gcr.io/lenses-container-registry/lenses-sql-processor
+#    processorImageTag: 2.3
+    mode: IN_PROC
+    heap: 1024M
+    minHeap: 128M
+    memLimit: 1152M
+    memRequest: 128M
+    livenessInitialDelay: 60 seconds
+
+  # alerts
+  alerts:
+    enabled: true
+    consumersLagThreshold: 50000
+
+    # The alert plugins to integrate with Lenses
+    plugins:
+      # Example
+      # - class: "io.lenses.alerts.plugin.slack.SlackAlertsPlugin"
+      #   config: |
+      #     {
+      #       webhook-url="https://your-slack-webhook-url
+      #       username=Lenses™
+      #       channel=lenses-slack-test
+      #     }
+      # - class: "io.lenses.alerts.plugin.am.AlertManagerPlugin"
+      #   config: |
+      #     {
+      #       endpoints="http://your-alert-manager-url"
+      #       source=PROD
+      #       generator-url="http://lenses_prod:port1"
+      #     }
+
+
+
+  #grafana
+  grafanaUrl:
+
+  # topics
+  topics:
+      # suffix to add to lenses system topics, for example if you are running more than one Lenses on the same kafka cluster
+    suffix:
+
+  security:
+    # Change Default Lenses user credentials.
+    # Username: admin / Password:admin
+    defaultUser:
+    # Example
+      username: admin
+      password: Q1w2e3r4!
+
+    # SPNEGO for incoming connections to Lenses
+    kerberos:
+      enabled: false
+      principal:
+      keytabData: |-
+
+      debug: false
+
+    # ldap setting
+    ldap:
+      enabled: false
+      url: ""
+      base: ""
+      password: ""
+      user: ""
+      filter: ""
+
+      # ldap plugins
+      plugin:
+        class: "io.lenses.security.ldap.LdapMemberOfUserGroupPlugin"
+        memberofKey: ""
+        groupExtractRegex: ""
+        personNameKey: ""
+
+    saml:
+      enabled: false
+      # The HTTPS URL of the Lenses deployment.
+      # This needs to match the Service Provider (SP) URL
+      # given to the Identity Provider (IdP)
+      # as it will be used as part of the SAML handshake protocol.
+      baseUrl:
+
+      # Provider type.
+      # Supported values:
+      # "azure"    - Microsoft Azure
+      # "okta"     - Okta
+      # "onelogin" - OneLogin
+      # "keycloak" - Keycloak
+      provider:
+
+      # XML File provided by the external Identity Provider.
+      # This is needed in order for Lenses SAML to understand how to communicate
+      # with the Idenity Provider.
+      # content of the XML file - base64 encoded
+      #  openssl base64 < idp.xml | tr -d '\n'
+      metadataFileData: |-
+
+      # base64 encoded keystore data to be used for SAML crypto.
+      #  openssl base64 < saml.jks | tr -d '\n'
+      keyStoreFileData: |-
+
+      # Password for accessing the keystore.
+      keyStorePassword:
+
+      # Alias to use for the private key within the keystore (only required when the keystore has multiple keys)
+      keyAlias:
+
+      # Password for accessing the private key within the keystore.
+      keyPassword:
+
+    append:
+      conf: |-
+
+  # license is the Lenses license
+  license: |-
+              {"key": "eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.efaLRHGbLvldSseAkKII6UmtHK4dc4oXyHv3Ws7rYgYBh5_zTCxeXw.KTTmOPGj7x02PLLUW6WgyA.CzGTnTk8jFnm1y6cJYI59NvtqRv9PNx7RIkTjox8kVXj77_YNMplCeAXlKweQp_IbUMDaN0zp1kahIBG9BD6Dn9szln_RvQpODUxttdynkQRkSG5QrMh1wRrShMoflHbfEk3sPTsol703sFQ46wDHLpfIIT2rvSdlQH-leAx5vE2i9vAQUb4qaRFxf9gyFaezCfm3AT4w6-y-I3v6ORZJU7OqH2Ku5AfmWLm5wN3lI4WYCTPsJ7gQQWngPxf_8xJOSYq9mP3vaPTf4r750GsgXJ8Ow_b1QzWH5Hz7hVowhidwO73JTYammB43x_rDu2DCBHitPGW62xFX91o0gBviHpwNtj9j8urtdpU6uqh3dadWbSivNJfp9I9MUhpTmkEj7FSpkBLMZbJ8soIvTJ4YH6MlJJPJWYe_PM0kqa589dNBOzy0_syyhQNX2D8X067gS_q9pHWtyz_44ZsJSbhloc5UQE6HVn-GTBy01tR5YKYbIlbfObTfeAIrotwHeVifsE7aBWRO3VzMEi5SfvggaQctMO0btfwSeRDPKMrqx0aMi5SZRiuijHxfNAPPTN_rVGTwQBAJVzRiLPnFhCsTarsSpJm3FMn6Gk_i8MYZWi-WSFIsyhQec2TONy0kmyO6PLL8LXpcHWuX-h6u69eszjjBwVtB2pwHyhQ7PA2Pj2V6o-2nhuFWPuJidmrvklMML7zzV_dXYjYh755jhfSZowefUL8nwMDkmIqj2kruappw069WjFpwJ1hwIYZBg0zT1GxkT-3J0KBkYueUmj7cLPF1MHaT-YfPH7yOaeuEACn3VfKKyszAoB-1JmUazUCCz9s10IJzCuxSAdVW1l-blm2wxX-EgCv7ROK6UzJhmQQtvEH5APRboQZuRvCiShPhN8ETE6y5XRlY3EGBuFcZZxC2UU1ysyTvLnvwjtWucacQXUn91O7MGqHWmFDTo7PKzIoyqwtKjEudctWD8ACLpXGo5xpPZnYBjliTnZMF0gGuqT_Hq38WoKlOPGHvTWBzKn2q0HrLd8hTBTffx8fKa66oaqXxAt1jYUcw0VDQR2aefloYAYy0rpyJ_90GoCK8_JXN_ggAocm0_ikGIrnY1M9UzBfAK8GXzgjKFG2_zY-CxL0pwIR02hzlMrHZjeP4ef7RfhPnInFZjhRl2Spd-e1Fo42QVGEejUZeAxN_IbX7gzsTPUQEGfQMp23aFEwn79oLUc46ngQrmW4d3miJ4v21ZUPpfc9Uaca6-FvDad9ui_R0GrS9Kuj0PXv0hxe96vHnmJYGeCRnIoklfC9WT4hBOlRYPsbtn-rNWRTUIQ4cfKx8mCsF7lsDDVHp2SBqZlkrNQPqGX_3U9HJgoln7CBhA44DhofNETrKPPEoXg7p2Rt2r7ea7ltb5L-3jEdfVqEZtnkN5DnYLWoN_8SRM0zLP5W8a_SXNxympka1wic9C55nJuVnA8nTMZ__QVzFTpZ_U9pywmX7P_MODECdv8CW-IapShy0Cg4Co6OiTLaEg1iFkLdSPUs93_vQamp9n5oZKfoCrHFmxZdcL1o4mbdVJgcmL2f32vaRhrvtJv2O2aUyN2GnUtlxmZz6fiKp96qqxD3ArQ3bd9U2a52DYgdlR4cvSXCI4jqd717mTLs8C5mPRF0cb0m48QhO2zrHdwtwG9CFNFuFHFHcrWkF6pd-eyDquBSbR7Qr9qzA4qex3jl3IFj5kjC1V6Q6TntJ2lkplAQQXTnOyk-JbRY1oL3njRRx-R2YSvndV90jac5kglV-vH5BSienJXYVuFs7BZITx5hlAffnQh5NBlnarql4FCK8AKdNzAdHfh3ZsEJNuHeKZk3uRN8rPKi4_FcZPaZXkGNYhnOs2FwKaZoUyESoIzUdZLCjiSZIa7LAFg3A7wTJh_ZI2eqHCXIsNehjn9vXOo00JWSwJ-rhmPnJvTsqfVFeb3NtxfxhFOYlGyauYJo8Frzxb0O38IwQEJgEDFM9KVv5zfy7yvd8mxaR_MwLroT5lefK76J_MGubFI676VCqVFb3-cf1CW6SM7Lfy1AqET1OUddiOCCvZUP0vr05xdMCx5TjlGDhvsQXleKwlyZomfYEotRnZvPMSP1IasN8bR_fOUdn35-Gnypta33Dwvz0Phz1CpU0bDf7xWRQs-LEnwtr0SKbBUCbcNYeG64HEKpPZPhzZ7cHXPN9DQbNOrL9qULFrlPxRLhKCcmHzlBbPIFLvecUtvtF1VZRKinIOsM0SKoCcMr_aGIRd_V77FFk5ZoBJA6vFVgJMiXYXNJZBtfVbx2LlFW6D-1o2Np-NULOax-tDzUmPja094XOKc1RZBwnOV-pJjKYkoOGDg50oMyANvpCMRQpPDWfXiLls3JRArwWUcQ3kS5eazZ7-pHw7Gg9yPegKGp7jns4qGTFtAFDzZz6yQqCo6VzijTGWSQnMVa9UfvVr7eRfNaBHGsNdSCgYG0uYoCn6dYbo1YftsZ0xljydAUE4gcBUpc3AbTYOs4E1W51z2OfFTlLmIzgJWAFLv0IY4riUGJyzjJbKx6Gn9iKzqHfhbqAs-2JKd0pSEaCBMn-g0Y9OIgtGzsCeacFAro-9WEDDAlVMErKwJTADxlVXmFSCR5eSAmiKP3gPcxjDi9GDzuE3kwGVY4c-eu4GQkjv8uzDwHLRqeWunTdXdPBlhsY1wy7xSbszordZr-QZsD6T16GyGi8c5NoPhJhJ7Px5KQbdrXfmJxCti8EvsmH1VP3rVPeLHEzjdn2HHTdKL7uFNASevzkNOFR7vtRMrYpYqUo2rUeQLU-plO_4b8kD81-SLveSR6UFSRtpXj012jlbp2NLCZ41o2PX7SgDb3Z8wc5Qm3lWDYFzmoVkb7Z28ntWMQCb2e9tV2Ra6FW09BM9XvhWMiNy1p9bI-9ekIqeCuLn8zrKJlokckz29Wjomkl9ocAtsdQHYJg_KMZF_hF2O3Ld2G8uKk1dxmxRIISh3DhM6ly8fY7Jooj5UT2UWYBsjxrZ_uMyx061JfjNzjjcehcjXkv5_JPh9D4-6LbraO1VxDm5m5lmSNJVW1fBzNOBh9pSJJeMkZgg6Om1NUCah4KX5TmIFkYK7-GH02pgTuKhqNqf8Xy_zS0NFvkQx8YRVaERFLFgh3hqxZODhbly90iVwwJGJUGIyThEaKDU6qdCbuhvXkPRC9hadhs9kyMiySnGKkaaKe9towqCNeOG5CrpMaSdsMpwU-xxUj9qdDzLC-j5XUZkElTynb20C9BpOnrp9gM6CIzVy6oB4EMIqYuBa3M6akERPksiA-Msp7hHl8ZKT_iJYKyYxPXAL7pJiTjLfboj3rtGBNJebvPCShEhJkhSYMFO7D4d6nHhZ66_faHwt942q2fuiSY2wO403W6aKIlln8D9XlXIjqioW6JzVf6BDavSf0qeTYTirqm-hiA0eE9CcwmyULHGBaHokENddBZuh88sCcors04Wl1V1czufdhmRf9YZWxdbZ6r6Wq0fi5CLEzbSf2qeDeDQ2CISxyeW-E8MJwBTatBAbPUDdqE2Rjkur3SStGrv6s_f7VE20N7N-ckN-VV2Nm5BZ_.mY8iZMcUwjHBqRgdX8Jntg", "source": "Lenses.io Ltd", "details": "Lenses", "clientId": "58c754b0-5386-11ec-9ed6-42010af01003"}
+
+  # licenseUrl is a url pointing to the Lenses license
+  licenseUrl:
+
+  # Uncomment to inject custom env vars if needed
+#  env:
+#    CUSTOM_ENV_VAR: "foo"
+  additionalEnv:
+    env:
+      PAUSE_EXEC: 1
+  # extra configurations that will be append to the lenses.conf file mounted in /mnt/settings
+  ## keys must be uppercase and underscores for separators suit for use as environment variables
+  ## see https://docs.lenses.io/install_setup/configuration/lenses-config.html#option-reference
+  configOverrides: {}
+    #LENSES_PROPERTY : value
+
+sidecarContainers:
+  # - name: sidecar-example
+  #   image: alpine
+  #   command: ["sh", "-c", "watch datetime"]

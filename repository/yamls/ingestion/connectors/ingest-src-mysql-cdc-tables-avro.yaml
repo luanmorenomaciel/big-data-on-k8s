@@ -1,0 +1,26 @@
+apiVersion: "kafka.strimzi.io/v1beta2"
+kind: "KafkaConnector"
+metadata:
+  # connector name
+  name: "ingest-src-mysql-cdc-tables-avro-603ff974"
+  labels:
+    # kafka connect [cluster] name
+    strimzi.io/cluster: edh
+spec:
+  class: io.debezium.connector.mysql.MySqlConnector
+  tasksMax: 1
+  config:
+    key.converter: "io.confluent.connect.avro.AvroConverter"
+    key.converter.schema.registry.url: "http://schema-registry-cp-schema-registry:8081"
+    value.converter: "io.confluent.connect.avro.AvroConverter"
+    value.converter.schema.registry.url: "http://schema-registry-cp-schema-registry:8081"
+    database.hostname: "mysql.database.svc.cluster.local"
+    database.port: "3306"
+    database.user: "root"
+    database.password: "8FlABrUE71"
+    database.server.name: "owshq.mysql"
+    table.whitelist: "owshq.device,owshq.commerce,owshq.computer"
+    database.history.kafka.bootstrap.servers: "edh-kafka-bootstrap:9092"
+    database.history.kafka.topic: "ddl-dbhistory-mysql-cdc-tables"
+    message.key.columns: "owshq.device:incr;owshq.commerce:incr;owshq.computer:incr"
+    tombstones.on​.delete: "true"

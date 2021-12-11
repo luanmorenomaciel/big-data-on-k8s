@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  # app name
+  name: ksqldb
+  # deployed yaml
+  namespace: cicd
+spec:
+  project: default
+  source:
+    repoURL: 'https://bitbucket.org/owshq/big-data-on-k8s.git'
+    path: repository/yamls/processing/ksqldb/
+    targetRevision: HEAD
+    directory:
+      recurse: true
+      jsonnet: {}
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: processing
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

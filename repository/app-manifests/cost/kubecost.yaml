@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  # app name
+  name: kubecost
+  # deployed yaml
+  namespace: cicd
+spec:
+  project: default
+  source:
+    repoURL: 'https://bitbucket.org/owshq/big-data-on-k8s.git'
+    path: repository/helm-charts/kubecost
+    targetRevision: HEAD
+    helm:
+      valueFiles:
+        - values.yaml
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: cost
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
