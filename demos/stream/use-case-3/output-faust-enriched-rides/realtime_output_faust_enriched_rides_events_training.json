@@ -1,0 +1,34 @@
+{
+  "tableName": "realtime_output_faust_enriched_rides_events",
+  "tableType": "REALTIME",
+  "segmentsConfig": {
+    "timeColumnName": "processing_time",
+    "timeType": "DAYS",
+    "retentionTimeUnit": "DAYS",
+    "retentionTimeValue": "60",
+    "schemaName": "sch_output_faust_enriched_rides",
+    "replication": "1",
+    "replicasPerPartition": "1"
+  },
+  "tenants": {},
+  "tableIndexConfig": {
+    "loadMode": "MMAP",
+    "invertedIndexColumns": [
+      "user_id"
+    ],
+    "streamConfigs": {
+      "streamType": "kafka",
+      "stream.kafka.consumer.type": "lowlevel",
+       "stream.kafka.topic.name": "output-faust-enriched-rides",
+       "stream.kafka.decoder.class.name": "org.apache.pinot.plugin.stream.kafka.KafkaJSONMessageDecoder",
+       "stream.kafka.consumer.factory.class.name": "org.apache.pinot.plugin.stream.kafka20.KafkaConsumerFactory",
+       "stream.kafka.broker.list": "edh-kafka-brokers.ingestion.svc.Cluster.local:9092",
+       "realtime.segment.flush.threshold.time": "3600000",
+       "realtime.segment.flush.threshold.size": "500000",
+       "stream.kafka.consumer.prop.auto.offset.reset": "smallest"
+    }
+  },
+  "metadata": {
+    "customConfigs": {}
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "tableName": "realtime_src_app_users_avro",
+  "tableType": "REALTIME",
+  "segmentsConfig": {
+    "timeColumnName": "dt_current_timestamp",
+    "timeType": "DAYS",
+    "retentionTimeUnit": "DAYS",
+    "retentionTimeValue": "60",
+    "schemaName": "sch_src_app_users_avro",
+    "replication": "1",
+    "replicasPerPartition": "1"
+  },
+  "tenants": {},
+  "tableIndexConfig": {
+    "loadMode": "MMAP",
+    "invertedIndexColumns": [
+      "dt_current_timestamp"
+    ],
+    "streamConfigs": {
+      "streamType": "kafka",
+      "stream.kafka.consumer.type": "lowlevel",
+       "stream.kafka.topic.name": "src-app-users-avro",
+       "stream.kafka.decoder.class.name": "org.apache.pinot.plugin.inputformat.avro.confluent.KafkaConfluentSchemaRegistryAvroMessageDecoder",
+       "stream.kafka.consumer.factory.class.name": "org.apache.pinot.plugin.stream.kafka20.KafkaConsumerFactory",
+       "stream.kafka.broker.list": "edh-kafka-brokers.ingestion.svc.Cluster.local:9092",
+       "schema.registry.url": "http://schema-registry-cp-schema-registry.ingestion.svc.Cluster.local:8081",
+       "stream.kafka.decoder.prop.schema.registry.rest.url": "http://schema-registry-cp-schema-registry.ingestion.svc.Cluster.local:8081",
+       "realtime.segment.flush.threshold.time": "3600000",
+       "realtime.segment.flush.threshold.size": "50000",
+       "stream.kafka.zk.broker.url": "edh-zookeeper-client:2181/kafka",
+       "stream.kafka.consumer.prop.auto.offset.reset": "smallest",
+       "stream.kafka.isolation.level": "read_committed"
+    }
+  },
+  "metadata": {
+    "customConfigs": {}
+  }
+}

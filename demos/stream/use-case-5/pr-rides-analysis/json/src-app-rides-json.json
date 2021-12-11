@@ -1,0 +1,14 @@
+{
+   "user_id":5308,
+   "time_stamp":1543851782026,
+   "source":"Northeastern University",
+   "destination":"Theatre District",
+   "distance":1.91,
+   "price":7.5,
+   "surge_multiplier":1,
+   "id":"24e541be-bfce-4260-9b0d-0151b2d76166",
+   "product_id":"997acbb5-e102-41e1-b155-9df7de0a73f2",
+   "name":"UberPool",
+   "cab_type":"Uber",
+   "dt_current_timestamp":"2021-07-13 15:21:26.327761"
+}

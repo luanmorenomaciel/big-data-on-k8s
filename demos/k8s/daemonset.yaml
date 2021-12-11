@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluent-bit
+spec:
+  selector:
+      matchLabels:
+        name: fluent-bit
+  template:
+    metadata:
+      labels:
+        name: fluent-bit
+    spec:
+      # nodeSelector:
+        # type: prod
+      containers:
+      - name: fluent-bit
+        image: gcr.io/cloud-solutions-images/fluent-bit:1.6
+        resources:
+          limits:
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 200Mi

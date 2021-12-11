@@ -1,0 +1,14 @@
+{
+"user_id": 422,
+"gender": "Bigender",
+"car_type": "Uber",
+"model_type": "UberPool",
+"country": "United States",
+"city": "North Whitney",
+"distance_in_km": 2.73,
+"final_price_real": 60.31,
+"dynamic_fare": false,
+"time_period": "afternoon",
+"event_time": "2021-07-30 12:45:16.668010",
+"processing_time": "2021-07-30 13:11:58.673711"
+}

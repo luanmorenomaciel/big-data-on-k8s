@@ -1,0 +1,63 @@
+{
+  "schemaName": "sch_output_ksqldb_stream_pr_credit_card_subscription_analysis_avro",
+  "dimensionFieldSpecs": [
+    {
+      "name": "SUB_INCR",
+      "dataType": "LONG"
+    },
+    {
+      "name": "SUB_ID",
+      "dataType": "STRING"
+    },
+    {
+      "name": "SUB_UID",
+      "dataType": "STRING"
+    },
+    {
+      "name": "PLAN",
+      "dataType": "STRING"
+    },
+    {
+      "name": "STATUS",
+      "dataType": "STRING"
+    },
+    {
+      "name": "PAYMENT_METHOD",
+      "dataType": "STRING"
+    },
+    {
+      "name": "SUBSCRIPTION_TERM",
+      "dataType": "STRING"
+    },
+    {
+      "name": "PAYMENT_TERM",
+      "dataType": "STRING"
+    },
+    {
+      "name": "SUB_USER_ID",
+      "dataType": "STRING"
+    },
+    {
+      "name": "processing_time",
+      "dataType": "STRING"
+    },
+    {
+      "name": "KSQL_COL_0",
+      "dataType": "STRING"
+    },
+    {
+      "name": "CREDIT_CARD_EXPIRY_DATE",
+      "dataType": "STRING"
+    },
+    {
+      "name": "CREDIT_CARD_TYPE",
+      "dataType": "STRING"
+    }
+  ],
+  "dateTimeFieldSpecs": [{
+    "name": "SUB_DT_CURRENT_TIMESTAMP",
+    "dataType": "STRING",
+    "format": "1:DAYS:SIMPLE_DATE_FORMAT:yyyy-MM-ddTHH:mm:ss.SSS-SS:SS",
+    "granularity": "1:DAYS"
+  }]
+}

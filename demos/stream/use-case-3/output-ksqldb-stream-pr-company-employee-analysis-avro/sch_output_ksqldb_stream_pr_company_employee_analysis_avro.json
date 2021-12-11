@@ -1,0 +1,43 @@
+{
+  "schemaName": "sch_output_ksqldb_stream_pr_company_employee_analysis_avro",
+  "dimensionFieldSpecs": [
+    {
+      "name": "FIRST_NAME",
+      "dataType": "STRING"
+    },
+    {
+      "name": "LAST_NAME",
+      "dataType": "STRING"
+    },
+    {
+      "name": "DATE_BIRTH",
+      "dataType": "STRING"
+    },
+    {
+      "name": "JOB",
+      "dataType": "STRING"
+    },
+    {
+      "name": "EMPLOYEE_IDENTIFICATION_NUMBER",
+      "dataType": "STRING"
+    },
+    {
+      "name": "BUSINESS_NAME",
+      "dataType": "STRING"
+    },
+    {
+      "name": "INDUSTRY",
+      "dataType": "STRING"
+    },
+    {
+      "name": "processing",
+      "dataType": "STRING"
+    }
+  ],
+  "dateTimeFieldSpecs": [{
+    "name": "USER_DT_CURRENT_TIMESTAMP",
+    "dataType": "STRING",
+    "format": "1:DAYS:SIMPLE_DATE_FORMAT:yyyy-MM-ddTHH:mm:ss",
+    "granularity": "1:DAYS"
+  }]
+}

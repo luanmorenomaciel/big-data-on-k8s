@@ -1,0 +1,36 @@
+{
+  "tableName": "realtime_output_ksqldb_stream_pr_company_employee_analysis",
+  "tableType": "REALTIME",
+  "segmentsConfig": {
+    "timeColumnName": "USER_DT_CURRENT_TIMESTAMP",
+    "timeType": "DAYS",
+    "retentionTimeUnit": "DAYS",
+    "retentionTimeValue": "60",
+    "schemaName": "sch_output_ksqldb_stream_pr_company_employee_analysis_avro",
+    "replication": "1",
+    "replicasPerPartition": "1"
+  },
+  "tenants": {},
+  "tableIndexConfig": {
+    "loadMode": "MMAP",
+    "invertedIndexColumns": [
+      "USER_DT_CURRENT_TIMESTAMP"
+    ],
+    "streamConfigs": {
+      "streamType": "kafka",
+      "stream.kafka.consumer.type": "lowlevel",
+       "stream.kafka.topic.name": "output-ksqldb-stream-pr-company-employee-analysis-avro",
+       "stream.kafka.decoder.class.name": "org.apache.pinot.plugin.inputformat.avro.confluent.KafkaConfluentSchemaRegistryAvroMessageDecoder",
+       "stream.kafka.consumer.factory.class.name": "org.apache.pinot.plugin.stream.kafka20.KafkaConsumerFactory",
+       "stream.kafka.broker.list": "edh-kafka-brokers.ingestion.svc.Cluster.local:9092",
+       "schema.registry.url": "http://schema-registry-cp-schema-registry.ingestion.svc.Cluster.local:8081",
+       "stream.kafka.decoder.prop.schema.registry.rest.url": "http://schema-registry-cp-schema-registry.ingestion.svc.Cluster.local:8081",
+       "realtime.segment.flush.threshold.time": "3600000",
+       "realtime.segment.flush.threshold.size": "50000",
+       "stream.kafka.consumer.prop.auto.offset.reset": "smallest"
+    }
+  },
+  "metadata": {
+    "customConfigs": {}
+  }
+}

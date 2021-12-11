@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: faust-enriched-rides
+  labels:
+    name: faust-enriched-rides
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: faust-enriched-rides
+  template:
+    metadata:
+      name: faust-enriched-rides
+      labels:
+        name: faust-enriched-rides
+    spec:
+      containers:
+        - name: faust-enriched-rides
+          image: owshq/faust-enriched-rides:1.0
+          ports:
+            - containerPort: 7000
+          resources:
+            requests:
+              cpu: 150m
+              memory: 256Mi
+            limits:
+              cpu: 300m
+              memory: 512Mi
+          env:
+            - name: DEBUG_MODE
+              value: "1"

@@ -1,0 +1,59 @@
+{
+  "schemaName": "sch_src_app_users_avro",
+  "dimensionFieldSpecs": [
+    {
+      "name": "user_id",
+      "dataType": "LONG"
+    },
+    {
+      "name": "uuid",
+      "dataType": "STRING"
+    },
+    {
+      "name": "first_name",
+      "dataType": "STRING"
+    },
+    {
+      "name": "last_name",
+      "dataType": "STRING"
+    },
+    {
+      "name": "date_birth",
+      "dataType": "STRING"
+    },
+    {
+      "name": "city",
+      "dataType": "STRING"
+    },
+    {
+      "name": "country",
+      "dataType": "STRING"
+    },
+    {
+      "name": "company_name",
+      "dataType": "STRING"
+    },
+    {
+      "name": "job",
+      "dataType": "STRING"
+    },
+    {
+      "name": "phone_number",
+      "dataType": "STRING"
+    },
+    {
+      "name": "last_access_time",
+      "dataType": "STRING"
+    },
+    {
+      "name": "time_zone",
+      "dataType": "STRING"
+    }
+  ],
+  "dateTimeFieldSpecs": [{
+    "name": "dt_current_timestamp",
+    "dataType": "STRING",
+    "format": "1:DAYS:SIMPLE_DATE_FORMAT:yyyy-MM-ddTHH:mm:ss.SSSSSS",
+    "granularity": "1:DAYS"
+  }]
+}

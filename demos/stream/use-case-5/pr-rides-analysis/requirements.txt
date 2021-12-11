@@ -1,0 +1,5 @@
+python-dotenv==0.19.0
+faust==1.10.4
+CurrencyConverter==0.16.3
+requests==2.26.0
+pymongo==3.12.0
